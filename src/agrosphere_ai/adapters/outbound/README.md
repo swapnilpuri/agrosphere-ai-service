@@ -1,0 +1,1 @@
+Future model registry, repository and Ollama adapters implement application ports. No inference, network calls or provider credentials in Milestone 0. Business routes must not be added until JWT issuer/audience validation is implemented.
