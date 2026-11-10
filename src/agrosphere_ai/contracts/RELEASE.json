@@ -1,0 +1,13 @@
+{
+  "release": "0.13.0",
+  "sourceManifestSha256": "a6b4d93666d8e2cdb83c826315edaabe2d48d73fe93ec147c76a8f26f1cd3914",
+  "files": {
+    "ai-service.openapi.json": "14ef1d81d40eebb0e528dd0cea356545ff41c0cc0e881ed1b5e1f44c07e6631e",
+    "DrcMeasurementRecorded.schema.json": "8117eaeddafa695529c99274cff4cbeafa372664914d95b4d5f8c5b2f7c31709",
+    "LatexCollectionAdjusted.schema.json": "985f6d66815682f06ad6e743cea517dcc8e96c99dd91f72f0234c86d7fb32fe1",
+    "LatexCollectionRecorded.schema.json": "d0dab40a2c23f751b3241f8842b180ead38e15102b699b4701827b857b58e479",
+    "LatexCollectionVoided.schema.json": "a0b6270ca8d73d46bbd07225a84ecdf8d4a27e24fbaad42dbb0a41953041f989",
+    "LatexCollectionRecorded.example.json": "ed7cf9e6995f7f2119d29a4fc3c80005c5ba1199cee1b275adb74c4ab2766b18",
+    "DrcMeasurementRecorded.example.json": "c024cabadcc8e4461e81ef93b13d4f4e9cf5c8eee88e4fc587ba182d0abe8cf9"
+  }
+}

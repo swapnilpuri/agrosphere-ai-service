@@ -1,0 +1,1481 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AgroSphere bounded M4 AI",
+    "version": "0.2.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.agrosphere.invalid"
+    }
+  ],
+  "paths": {
+    "/api/v1/ai/estates/{estateId}/blocks/{blockId}/production/baselines": {
+      "get": {
+        "operationId": "readForecast",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "datasetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$|\\+00:00$"
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GENERATED_POINT_IN_TIME",
+                "LIVE_FIRST_RECEIPT"
+              ]
+            }
+          },
+          {
+            "name": "labelAsOf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "Z$|\\+00:00$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful scoped read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forecast"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "description": "SIMULATED only. Independent JWT then role/estate and active block validation before all evidence. Closed queries; no unknown or repeated query keys. Local-midnight cutoff and separate next-midnight label cutoff; generated availability is not historical receipt evidence."
+      }
+    },
+    "/api/v1/ai/estates/{estateId}/blocks/{blockId}/models/{modelId}": {
+      "get": {
+        "operationId": "readModelRecord",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "modelId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "name": "datasetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful scoped read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelRecord"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "description": "SIMULATED only. Independent JWT then role/estate and active block validation before all evidence. Closed queries; no unknown or repeated query keys. Local-midnight cutoff and separate next-midnight label cutoff; generated availability is not historical receipt evidence."
+      }
+    },
+    "/api/v1/ai/estates/{estateId}/blocks/{blockId}/evaluations/{evaluationId}": {
+      "get": {
+        "operationId": "readEvaluation",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "evaluationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          {
+            "name": "datasetId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful scoped read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evaluation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "description": "SIMULATED only. Independent JWT then role/estate and active block validation before all evidence. Closed queries; no unknown or repeated query keys. Local-midnight cutoff and separate next-midnight label cutoff; generated availability is not historical receipt evidence."
+      }
+    },
+    "/api/v1/ai/estates/{estateId}/blocks/{blockId}/assistant": {
+      "post": {
+        "operationId": "readAssistantAnswer",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful scoped read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantAnswer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded Problem Details",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "description": "SIMULATED only. Independent JWT then role/estate and active block validation before all evidence. Closed queries; no unknown or repeated query keys. Local-midnight cutoff and separate next-midnight label cutoff; generated availability is not historical receipt evidence.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Scope": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "blockId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "estateId",
+          "blockId"
+        ]
+      },
+      "SourceRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "collectionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "bodyHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "collectionDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "sourceAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$|\\+00:00$"
+          },
+          "availableAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$|\\+00:00$"
+          }
+        },
+        "required": [
+          "eventId",
+          "collectionId",
+          "version",
+          "bodyHash",
+          "collectionDate",
+          "sourceAt",
+          "availableAt"
+        ]
+      },
+      "TargetResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "WET",
+              "DRY"
+            ]
+          },
+          "modelId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "comparatorModelId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ELIGIBLE",
+              "INSUFFICIENT_HISTORY",
+              "INCOMPLETE_SOURCE",
+              "PENDING_DRC"
+            ]
+          },
+          "predictedKg": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?(?:0|[1-9][0-9]*)\\.[0-9]{3}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "comparatorKg": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?(?:0|[1-9][0-9]*)\\.[0-9]{3}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "maxItems": 1000
+          },
+          "anomalyStatus": {
+            "type": "string",
+            "enum": [
+              "NOT_EVALUATED",
+              "UNSCORED",
+              "FLAGGED",
+              "NOT_FLAGGED"
+            ]
+          },
+          "actualKg": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?(?:0|[1-9][0-9]*)\\.[0-9]{3}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "residualKg": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^-?(?:0|[1-9][0-9]*)\\.[0-9]{3}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "thresholdKg": {
+            "type": "string",
+            "enum": [
+              "1.000",
+              "5.000"
+            ]
+          },
+          "labelStatus": {
+            "type": "string",
+            "enum": [
+              "NOT_EVALUATED",
+              "ELIGIBLE",
+              "INSUFFICIENT_HISTORY",
+              "INCOMPLETE_SOURCE",
+              "PENDING_DRC"
+            ]
+          },
+          "labelSources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "maxItems": 1000
+          }
+        },
+        "required": [
+          "target",
+          "modelId",
+          "comparatorModelId",
+          "status",
+          "predictedKg",
+          "comparatorKg",
+          "sources",
+          "anomalyStatus",
+          "actualKg",
+          "residualKg",
+          "thresholdKg",
+          "labelStatus",
+          "labelSources"
+        ]
+      },
+      "Forecast": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "datasetId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "GENERATED_POINT_IN_TIME",
+              "LIVE_FIRST_RECEIPT"
+            ]
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$|\\+00:00$"
+          },
+          "targetDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "estateTimezone": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "labelAsOf": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "Z$|\\+00:00$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TargetResult"
+            },
+            "maxItems": 2,
+            "minItems": 2
+          },
+          "sourceDataProvenance": {
+            "type": "string",
+            "enum": [
+              "SIMULATED"
+            ]
+          },
+          "forecastProvenance": {
+            "type": "string",
+            "enum": [
+              "PREDICTED"
+            ]
+          },
+          "coverage": {
+            "type": "string",
+            "enum": [
+              "OBSERVED_ONLY"
+            ]
+          },
+          "uncertainty": {
+            "type": "string",
+            "enum": [
+              "UNCALIBRATED"
+            ]
+          }
+        },
+        "required": [
+          "scope",
+          "datasetId",
+          "mode",
+          "asOf",
+          "targetDate",
+          "estateTimezone",
+          "labelAsOf",
+          "targets",
+          "sourceDataProvenance",
+          "forecastProvenance",
+          "coverage",
+          "uncertainty"
+        ]
+      },
+      "ModelRecord": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "algorithm": {
+            "type": "string",
+            "enum": [
+              "WET_KG_MEAN_7_V1",
+              "DRY_KG_MEAN_7_V1",
+              "WET_KG_LAST_DAY_V1",
+              "DRY_KG_LAST_DAY_V1"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "enum": [
+              "WET",
+              "DRY"
+            ]
+          },
+          "featurePolicy": {
+            "type": "string",
+            "enum": [
+              "SOURCE_AND_AVAILABILITY_BEFORE_LOCAL_MIDNIGHT_V1"
+            ]
+          },
+          "labelPolicy": {
+            "type": "string",
+            "enum": [
+              "AS_KNOWN_AT_NEXT_LOCAL_MIDNIGHT_V1"
+            ]
+          },
+          "rounding": {
+            "type": "string",
+            "enum": [
+              "SOURCE_ROUNDED_SUM_OUTPUT_HALF_UP_3_V1"
+            ]
+          },
+          "coverage": {
+            "type": "string",
+            "enum": [
+              "OBSERVED_ONLY"
+            ]
+          },
+          "uncertainty": {
+            "type": "string",
+            "enum": [
+              "UNCALIBRATED"
+            ]
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "DEMO_ONLY"
+            ]
+          },
+          "windowDays": {
+            "type": "integer",
+            "enum": [
+              1,
+              7
+            ]
+          },
+          "policyVersion": {
+            "type": "string",
+            "enum": [
+              "M4_BASELINES_V1"
+            ]
+          },
+          "anomalyPolicy": {
+            "type": "string",
+            "enum": [
+              "ABSOLUTE_FROZEN_RESIDUAL_STRICT_GREATER_V1"
+            ]
+          },
+          "thresholdKg": {
+            "type": "string",
+            "enum": [
+              "1.000",
+              "5.000"
+            ]
+          }
+        },
+        "required": [
+          "algorithm",
+          "target",
+          "featurePolicy",
+          "labelPolicy",
+          "rounding",
+          "coverage",
+          "uncertainty",
+          "stage",
+          "windowDays",
+          "policyVersion",
+          "anomalyPolicy",
+          "thresholdKg"
+        ]
+      },
+      "Metric": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "WET",
+              "DRY"
+            ]
+          },
+          "split": {
+            "type": "string",
+            "enum": [
+              "TRAIN",
+              "VALIDATION",
+              "TEST"
+            ]
+          },
+          "algorithm": {
+            "type": "string",
+            "enum": [
+              "MEAN_7",
+              "LAST_DAY"
+            ]
+          },
+          "scored": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "withheld": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "sumAbsoluteErrorKg": {
+            "type": "string",
+            "pattern": "^-?(?:0|[1-9][0-9]*)\\.[0-9]{3}$"
+          },
+          "maeKg": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:0|[1-9][0-9]*)\\.[0-9]{6}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "withheldReasons": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                }
+              ],
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "maxItems": 4
+          }
+        },
+        "required": [
+          "target",
+          "split",
+          "algorithm",
+          "scored",
+          "withheld",
+          "sumAbsoluteErrorKg",
+          "maeKg",
+          "withheldReasons"
+        ]
+      },
+      "Confusion": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "WET",
+              "DRY"
+            ]
+          },
+          "split": {
+            "type": "string",
+            "enum": [
+              "TRAIN",
+              "VALIDATION",
+              "TEST"
+            ]
+          },
+          "truePositive": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "falsePositive": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "trueNegative": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "falseNegative": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "unscored": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "precision": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:0|[1-9][0-9]*)\\.[0-9]{6}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recall": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:0|[1-9][0-9]*)\\.[0-9]{6}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "target",
+          "split",
+          "truePositive",
+          "falsePositive",
+          "trueNegative",
+          "falseNegative",
+          "unscored",
+          "precision",
+          "recall"
+        ]
+      },
+      "Evaluation": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "evaluationId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "datasetId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "sourceContracts": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              ],
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "maxItems": 4
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "splitBoundaries": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "string",
+                  "format": "date"
+                }
+              ],
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "maxItems": 3
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelRecord"
+            },
+            "maxItems": 4
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Metric"
+            },
+            "maxItems": 12
+          },
+          "anomalyCounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Confusion"
+            },
+            "maxItems": 6
+          },
+          "syntheticTruthHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "GENERATED_POINT_IN_TIME"
+            ]
+          },
+          "splitPolicy": {
+            "type": "string",
+            "enum": [
+              "FORWARD_7_28_14_14_NO_TUNING_V1"
+            ]
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "DEMO_ONLY"
+            ]
+          }
+        },
+        "required": [
+          "evaluationId",
+          "scope",
+          "datasetId",
+          "sourceContracts",
+          "startDate",
+          "endDate",
+          "splitBoundaries",
+          "models",
+          "metrics",
+          "anomalyCounts",
+          "syntheticTruthHash",
+          "mode",
+          "splitPolicy",
+          "stage"
+        ]
+      },
+      "AssistantRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "intent": {
+            "type": "string",
+            "enum": [
+              "PRODUCTION_SUMMARY",
+              "FORECAST_EXPLANATION",
+              "ANOMALY_EXPLANATION",
+              "EVIDENCE_INSPECTION"
+            ]
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$|\\+00:00$"
+          },
+          "labelAsOf": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "Z$|\\+00:00$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "GENERATED_POINT_IN_TIME",
+              "LIVE_FIRST_RECEIPT"
+            ]
+          },
+          "datasetId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "environmentFrom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "Z$|\\+00:00$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "environmentTo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "Z$|\\+00:00$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "intent",
+          "asOf",
+          "labelAsOf",
+          "mode",
+          "datasetId",
+          "environmentFrom",
+          "environmentTo"
+        ]
+      },
+      "EvidenceRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "PRODUCTION",
+              "ENVIRONMENT",
+              "MODEL",
+              "FORECAST",
+              "EVALUATION"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "href": {
+            "type": "string",
+            "pattern": "^/api/v1/(ai|analytics)/",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "href"
+        ]
+      },
+      "AssistantAnswer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "$ref": "#/components/schemas/Scope"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "DETERMINISTIC_EVIDENCE_V1"
+            ]
+          },
+          "templateVersion": {
+            "type": "string",
+            "enum": [
+              "M4_EVIDENCE_TEMPLATES_V1"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ANSWERED",
+              "PARTIAL",
+              "REFUSED"
+            ]
+          },
+          "intent": {
+            "type": "string",
+            "enum": [
+              "PRODUCTION_SUMMARY",
+              "FORECAST_EXPLANATION",
+              "ANOMALY_EXPLANATION",
+              "EVIDENCE_INSPECTION"
+            ]
+          },
+          "statements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "evidenceRefs": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EvidenceRef"
+                  },
+                  "maxItems": 50
+                }
+              },
+              "required": [
+                "text",
+                "evidenceRefs"
+              ]
+            },
+            "maxItems": 10
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "maxItems": 12
+          }
+        },
+        "required": [
+          "scope",
+          "provider",
+          "templateVersion",
+          "status",
+          "intent",
+          "statements",
+          "limitations"
+        ]
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "status": {
+            "type": "integer",
+            "enum": [
+              400,
+              401,
+              403,
+              404,
+              409,
+              413,
+              429,
+              503
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail"
+        ]
+      }
+    }
+  }
+}

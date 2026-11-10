@@ -1,0 +1,1339 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "LatexCollectionRecorded"
+    },
+    "eventVersion": {
+      "type": "integer",
+      "const": 2
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+    },
+    "source": {
+      "type": "string",
+      "const": "agrosphere-operations-service"
+    },
+    "correlationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "estateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "blockId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dataProvenance": {
+      "type": "string",
+      "enum": [
+        "REAL",
+        "SIMULATED"
+      ]
+    },
+    "aggregateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregateVersion": {
+      "type": "integer",
+      "const": 0
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "collection": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/CollectionView"
+            },
+            {
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "PENDING_DRC"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "collection",
+        "reason"
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "timestamp",
+    "source",
+    "correlationId",
+    "estateId",
+    "blockId",
+    "dataProvenance",
+    "aggregateId",
+    "aggregateVersion",
+    "payload"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agrosphere.invalid/operations/v2/LatexCollectionRecorded.schema.json",
+  "title": "LatexCollectionRecorded",
+  "$defs": {
+    "CollectionWeightEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "SCALE",
+            "MANUAL_ENTRY"
+          ]
+        },
+        "sourceReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "instrumentReference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "method",
+        "sourceReference"
+      ]
+    },
+    "CollectionDrcInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "drcPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "multipleOf": 0.01
+        },
+        "measuredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?(?:Z|[+-]\\d{2}:\\d{2})$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "LAB_REPORTED",
+            "FIELD_TEST"
+          ]
+        },
+        "sourceReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "dataProvenance": {
+          "type": "string",
+          "enum": [
+            "REAL",
+            "SIMULATED"
+          ]
+        },
+        "sampleReference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instrumentReference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "drcPercent",
+        "measuredAt",
+        "method",
+        "sourceReference",
+        "dataProvenance"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "LAB_REPORTED"
+              }
+            },
+            "required": [
+              "method"
+            ]
+          },
+          "then": {
+            "required": [
+              "sampleReference"
+            ],
+            "properties": {
+              "sampleReference": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "CollectionCreate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tappingRecordId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "collectionReference": {
+          "type": "string",
+          "pattern": "^\\s*[A-Za-z0-9][A-Za-z0-9_-]{0,63}\\s*$",
+          "description": "Trim and uppercase ASCII before reference uniqueness and idempotency comparison."
+        },
+        "collectedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?(?:Z|[+-]\\d{2}:\\d{2})$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "wetLatexKg": {
+          "type": "number",
+          "minimum": 0.001,
+          "maximum": 999999.999,
+          "multipleOf": 0.001
+        },
+        "weightEvidence": {
+          "$ref": "#/$defs/CollectionWeightEvidence"
+        },
+        "dataProvenance": {
+          "type": "string",
+          "enum": [
+            "REAL",
+            "SIMULATED"
+          ]
+        },
+        "backdateReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "replacementOfCollectionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "tappingRecordId",
+        "collectionReference",
+        "collectedAt",
+        "wetLatexKg",
+        "weightEvidence",
+        "dataProvenance"
+      ]
+    },
+    "CollectionInitialDrcWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "measurement": {
+          "$ref": "#/$defs/CollectionDrcInput"
+        }
+      },
+      "required": [
+        "version",
+        "measurement"
+      ]
+    },
+    "CollectionCorrection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "wetLatexKg": {
+          "type": "number",
+          "minimum": 0.001,
+          "maximum": 999999.999,
+          "multipleOf": 0.001
+        },
+        "collectedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?(?:Z|[+-]\\d{2}:\\d{2})$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "weightEvidence": {
+          "$ref": "#/$defs/CollectionWeightEvidence"
+        },
+        "backdateReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "replacementMeasurement": {
+          "$ref": "#/$defs/CollectionDrcInput"
+        }
+      },
+      "required": [
+        "version",
+        "reason"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "wetLatexKg"
+          ]
+        },
+        {
+          "required": [
+            "collectedAt"
+          ]
+        },
+        {
+          "required": [
+            "weightEvidence"
+          ]
+        },
+        {
+          "required": [
+            "backdateReason"
+          ]
+        },
+        {
+          "required": [
+            "replacementMeasurement"
+          ]
+        }
+      ],
+      "description": "At least one actual change, or a replacement observation. Omission means unchanged; null only clears backdateReason when resulting date is not historical. Domain validation rejects no-op corrections."
+    },
+    "CollectionVoid": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "version",
+        "reason"
+      ]
+    },
+    "CollectionDrcMeasurementView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "drcPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "multipleOf": 0.01
+        },
+        "measuredAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "LAB_REPORTED",
+            "FIELD_TEST"
+          ]
+        },
+        "sourceReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "dataProvenance": {
+          "type": "string",
+          "enum": [
+            "REAL",
+            "SIMULATED"
+          ]
+        },
+        "sampleReference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instrumentReference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "collectionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "introducedVersion": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "recordedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "drcPercent",
+        "measuredAt",
+        "method",
+        "sourceReference",
+        "dataProvenance",
+        "sampleReference",
+        "instrumentReference",
+        "id",
+        "collectionId",
+        "introducedVersion",
+        "recordedAt",
+        "recordedBy"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "LAB_REPORTED"
+              }
+            },
+            "required": [
+              "method"
+            ]
+          },
+          "then": {
+            "required": [
+              "sampleReference"
+            ],
+            "properties": {
+              "sampleReference": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "CollectionWeightEvidenceView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "SCALE",
+            "MANUAL_ENTRY"
+          ]
+        },
+        "sourceReference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "instrumentReference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "method",
+        "sourceReference",
+        "instrumentReference"
+      ]
+    },
+    "CollectionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tappingRecordId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "assignmentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "estateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "blockId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "divisionIdSnapshot": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "tappingDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "estateTimezone": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "\\S"
+        },
+        "estateVersionSnapshot": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "blockVersionSnapshot": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "masterValidatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "collectionReference": {
+          "type": "string",
+          "pattern": "^[A-Z0-9][A-Z0-9_-]{0,63}$"
+        },
+        "replacementOfCollectionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dataProvenance": {
+          "type": "string",
+          "enum": [
+            "REAL",
+            "SIMULATED"
+          ]
+        },
+        "collectedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "collectionDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "wetLatexKg": {
+          "type": "number",
+          "minimum": 0.001,
+          "maximum": 999999.999,
+          "multipleOf": 0.001
+        },
+        "weightEvidence": {
+          "$ref": "#/$defs/CollectionWeightEvidenceView"
+        },
+        "backdateReason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currentMeasurement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CollectionDrcMeasurementView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PENDING_DRC",
+            "CALCULATED",
+            "VOIDED"
+          ]
+        },
+        "dryRubberExactKg": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 999999.999,
+              "multipleOf": 0.0000001
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dryRubberKg": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "multipleOf": 0.001,
+              "maximum": 999999.999
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "calculationPolicy": {
+          "anyOf": [
+            {
+              "const": "DRC_KG_V1",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "createdBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "id",
+        "tappingRecordId",
+        "assignmentId",
+        "estateId",
+        "blockId",
+        "divisionIdSnapshot",
+        "workerId",
+        "tappingDate",
+        "estateTimezone",
+        "estateVersionSnapshot",
+        "blockVersionSnapshot",
+        "masterValidatedAt",
+        "collectionReference",
+        "replacementOfCollectionId",
+        "dataProvenance",
+        "collectedAt",
+        "collectionDate",
+        "wetLatexKg",
+        "weightEvidence",
+        "backdateReason",
+        "currentMeasurement",
+        "status",
+        "dryRubberExactKg",
+        "dryRubberKg",
+        "calculationPolicy",
+        "version",
+        "createdAt",
+        "updatedAt",
+        "createdBy",
+        "updatedBy"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "PENDING_DRC"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "currentMeasurement": {
+                "type": "null"
+              },
+              "dryRubberExactKg": {
+                "type": "null"
+              },
+              "dryRubberKg": {
+                "type": "null"
+              },
+              "calculationPolicy": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "CALCULATED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "currentMeasurement": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "dryRubberExactKg": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "dryRubberKg": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "calculationPolicy": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "VOIDED"
+              }
+            }
+          },
+          "then": {
+            "anyOf": [
+              {
+                "properties": {
+                  "currentMeasurement": {
+                    "type": "null"
+                  },
+                  "dryRubberExactKg": {
+                    "type": "null"
+                  },
+                  "dryRubberKg": {
+                    "type": "null"
+                  },
+                  "calculationPolicy": {
+                    "type": "null"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "currentMeasurement": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "dryRubberExactKg": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "dryRubberKg": {
+                    "not": {
+                      "type": "null"
+                    }
+                  },
+                  "calculationPolicy": {
+                    "not": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "CollectionAdjustmentView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "CORRECT",
+            "VOID"
+          ]
+        },
+        "beforeVersion": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "afterVersion": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 1,
+          "maximum": 9223372036854775807
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        },
+        "approvedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "approvedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "beforeVersion",
+        "afterVersion",
+        "reason",
+        "approvedAt",
+        "approvedBy",
+        "correlationId"
+      ]
+    },
+    "CollectionHistoryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "commandKind": {
+          "type": "string",
+          "enum": [
+            "CREATE",
+            "DRC",
+            "CORRECT",
+            "VOID"
+          ]
+        },
+        "recordedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$",
+          "description": "Explicit offset; exact microsecond representation. Extra trailing zeros permitted; nonzero digits beyond position six rejected."
+        },
+        "recordedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "\\S"
+        },
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/CollectionView"
+        },
+        "adjustment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CollectionAdjustmentView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "collectionId",
+        "version",
+        "commandKind",
+        "recordedAt",
+        "recordedBy",
+        "correlationId",
+        "snapshot",
+        "adjustment"
+      ]
+    },
+    "CollectionPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CollectionView"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "totalElements": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        }
+      },
+      "required": [
+        "content",
+        "page",
+        "size",
+        "totalElements"
+      ]
+    },
+    "CollectionHistoryPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CollectionHistoryEntry"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "totalElements": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        }
+      },
+      "required": [
+        "content",
+        "page",
+        "size",
+        "totalElements"
+      ]
+    },
+    "CollectionDrcMeasurementPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CollectionDrcMeasurementView"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "totalElements": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        }
+      },
+      "required": [
+        "content",
+        "page",
+        "size",
+        "totalElements"
+      ]
+    },
+    "CollectionSummaryRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "groupKey": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dataProvenance": {
+          "type": "string",
+          "enum": [
+            "REAL",
+            "SIMULATED"
+          ]
+        },
+        "activeCollectionCount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "pendingDrcCount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "calculatedCollectionCount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "voidedCollectionCount": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "totalWetLatexKg": {
+          "type": "number",
+          "minimum": 0,
+          "multipleOf": 0.001
+        },
+        "pendingWetLatexKg": {
+          "type": "number",
+          "minimum": 0,
+          "multipleOf": 0.001
+        },
+        "calculatedWetLatexKg": {
+          "type": "number",
+          "minimum": 0,
+          "multipleOf": 0.001
+        },
+        "knownDryRubberKg": {
+          "type": "number",
+          "minimum": 0,
+          "multipleOf": 0.001
+        },
+        "weightedDrcPercent": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "multipleOf": 0.01
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isComplete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "groupKey",
+        "dataProvenance",
+        "activeCollectionCount",
+        "pendingDrcCount",
+        "calculatedCollectionCount",
+        "voidedCollectionCount",
+        "totalWetLatexKg",
+        "pendingWetLatexKg",
+        "calculatedWetLatexKg",
+        "knownDryRubberKg",
+        "weightedDrcPercent",
+        "isComplete"
+      ]
+    },
+    "CollectionSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "groupBy": {
+          "type": "string",
+          "enum": [
+            "total",
+            "estate",
+            "division",
+            "block",
+            "worker",
+            "date"
+          ]
+        },
+        "from": {
+          "type": "string",
+          "format": "date"
+        },
+        "to": {
+          "type": "string",
+          "format": "date"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CollectionSummaryRow"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "totalElements": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "aggregationPolicy": {
+          "type": "string",
+          "const": "SUM_ROUNDED_COLLECTION_KG_V1"
+        }
+      },
+      "required": [
+        "groupBy",
+        "from",
+        "to",
+        "content",
+        "page",
+        "size",
+        "totalElements",
+        "aggregationPolicy"
+      ]
+    }
+  }
+}

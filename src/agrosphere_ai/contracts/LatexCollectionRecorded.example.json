@@ -1,0 +1,52 @@
+{
+  "eventId": "00000000-0000-0000-0000-000000000601",
+  "eventType": "LatexCollectionRecorded",
+  "eventVersion": 2,
+  "timestamp": "2026-10-27T11:00:00Z",
+  "source": "agrosphere-operations-service",
+  "correlationId": "00000000-0000-0000-0000-000000000501",
+  "estateId": "00000000-0000-0000-0000-000000000001",
+  "blockId": "00000000-0000-0000-0000-000000000002",
+  "dataProvenance": "SIMULATED",
+  "aggregateId": "00000000-0000-0000-0000-000000000401",
+  "aggregateVersion": 0,
+  "payload": {
+    "collection": {
+      "id": "00000000-0000-0000-0000-000000000401",
+      "tappingRecordId": "00000000-0000-0000-0000-000000000301",
+      "assignmentId": "00000000-0000-0000-0000-000000000201",
+      "estateId": "00000000-0000-0000-0000-000000000001",
+      "blockId": "00000000-0000-0000-0000-000000000002",
+      "divisionIdSnapshot": "00000000-0000-0000-0000-000000000003",
+      "workerId": "SIMULATED-WORKER",
+      "tappingDate": "2026-10-27",
+      "estateTimezone": "UTC",
+      "estateVersionSnapshot": 0,
+      "blockVersionSnapshot": 0,
+      "masterValidatedAt": "2026-10-27T09:00:00Z",
+      "collectionReference": "LOT-01",
+      "replacementOfCollectionId": null,
+      "dataProvenance": "SIMULATED",
+      "collectedAt": "2026-10-27T10:00:00Z",
+      "collectionDate": "2026-10-27",
+      "wetLatexKg": 125.5,
+      "weightEvidence": {
+        "method": "SCALE",
+        "sourceReference": "SIMULATED-WEIGH-01",
+        "instrumentReference": null
+      },
+      "backdateReason": null,
+      "currentMeasurement": null,
+      "status": "PENDING_DRC",
+      "dryRubberExactKg": null,
+      "dryRubberKg": null,
+      "calculationPolicy": null,
+      "version": 0,
+      "createdAt": "2026-10-27T11:00:00Z",
+      "updatedAt": "2026-10-27T11:00:00Z",
+      "createdBy": "SIMULATED-SUPERVISOR",
+      "updatedBy": "SIMULATED-SUPERVISOR"
+    },
+    "reason": null
+  }
+}
