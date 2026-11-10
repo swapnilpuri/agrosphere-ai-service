@@ -1,3 +1,11 @@
+# M4 local delivery in progress — 2026-11-10
+
+Owner-approved bounded M4 adds observed dry/wet mass baselines, immutable evaluation/model records, explicit point-in-time generated chronology and a closed-intent evidence composer. Business and broker activation default disabled. Engineering/owner acceptance remain separate; consult Architecture's checkpoint for actual checks. The historical foundation-only text below is superseded only for this approved scope.
+
+Run `.venv/Scripts/python.exe -m pytest -q -p no:cacheprovider` (or `python -m pytest` in an independent installed environment), `python -m compileall -q src migrations`, and the packaged contract pin check `python -c "from agrosphere_ai.adapters.codec import validate_pins; validate_pins()"`. No ML extra is needed. Public contract snapshots are independently packaged under `src/agrosphere_ai/contracts`; builds never read sibling source paths.
+
+Runtime and migration boundaries are reviewed in [M4_RUNTIME_REVIEW.md](docs/M4_RUNTIME_REVIEW.md). Do not run migration 0002 or enable business/consumer paths on an existing database. It requires a hashed owned manifest, companion marker and matching DB/principals. Generated import is an offline fixture command, never an HTTP endpoint. The independent Infrastructure `scripts/verify_m4.py` creates and removes its own complete generated project and demonstrates real signed identity/Gateway/API/Web behavior. It does not load existing `.env` files. Provider is DETERMINISTIC_EVIDENCE_V1; no LLM, cloud call or paid API. No REAL/production/Git/AEO action is authorized.
+
 # agrosphere-ai-service
 
 Forecasting, anomaly analysis, assistant orchestration, model evaluation/versioning and evidence-backed recommendations.

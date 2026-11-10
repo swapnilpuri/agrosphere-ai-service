@@ -67,7 +67,7 @@ def compose(scope, frozen, intent, reference, bearer, environment_from=None, env
             partial = True
             limitations.append("Environmental evidence unavailable; no observation or relationship was invented.")
     result = {"scope": {"estateId": scope.estate_id, "blockId": scope.block_id}, "provider": "DETERMINISTIC_EVIDENCE_V1",
-              "templateVersion": "M4_EVIDENCE_TEMPLATES_V1", "status": "PARTIAL" if partial else "ANSWERED",
+              "templateVersion": "M4_EVIDENCE_TEMPLATES_V1", "status": "REFUSED" if not statements else "PARTIAL" if partial else "ANSWERED",
               "intent": intent, "statements": statements, "limitations": limitations}
     if sum(len(s["evidenceRefs"]) for s in statements) > 50 or len(json.dumps(result).encode()) > 65536:
         raise ValueError("Assistant admission limit")

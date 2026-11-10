@@ -13,6 +13,7 @@ class Runtime:
     store: object
     references: object
     jwt: object
+    live_ready: object = lambda: False
 
 
 def configured_runtime():
@@ -24,4 +25,4 @@ def configured_runtime():
     with store.connection():
         pass
     return Runtime(guard, store, ReferenceHttp(os.environ["ESTATE_SERVICE_URL"], os.environ["ANALYTICS_SERVICE_URL"]),
-                   JwtVerifier(os.environ["OIDC_ISSUER_URI"], os.environ["OIDC_JWK_SET_URI"]))
+                   JwtVerifier(os.environ["OIDC_ISSUER_URI"], os.environ["OIDC_JWK_SET_URI"], os.environ.get("OIDC_AUDIENCE", "agrosphere-api")))

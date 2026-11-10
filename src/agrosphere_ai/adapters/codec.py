@@ -7,6 +7,7 @@ import hashlib
 import json
 import re
 from uuid import UUID
+from zoneinfo import ZoneInfo
 from jsonschema import Draft202012Validator, FormatChecker
 from agrosphere_ai.domain.baselines import Revision, Scope, canonical, fingerprint
 
@@ -55,7 +56,18 @@ def unique_object(pairs):
 def load_json(raw):
     if len(raw) > 1048576:
         raise ValueError("ADMISSION_LIMIT")
-    return json.loads(raw, parse_float=Decimal, object_pairs_hook=unique_object,
+    def decimal_value(token):
+        if len(token) > 50 or len(re.sub(r"[^0-9]", "", token.split("e")[0].split("E")[0])) > 32:
+            raise ValueError("ADMISSION_LIMIT")
+        exponent = re.split(r"[eE]", token)
+        if len(exponent) > 1 and abs(int(exponent[1])) > 12:
+            raise ValueError("ADMISSION_LIMIT")
+        return Decimal(token)
+    def integer_value(token):
+        if len(token.lstrip("-")) > 19:
+            raise ValueError("ADMISSION_LIMIT")
+        return int(token)
+    return json.loads(raw, parse_float=decimal_value, parse_int=integer_value, object_pairs_hook=unique_object,
                       parse_constant=lambda _: (_ for _ in ()).throw(ValueError("Nonfinite JSON")))
 
 
@@ -66,6 +78,8 @@ def parse_event(raw, received_at):
         raise ValueError("Unsupported event")
     schema = json.loads(CONTRACTS.joinpath(name + ".schema.json").read_text(), parse_float=Decimal)
     Draft202012Validator(schema, format_checker=FormatChecker()).validate(event)
+    if event["dataProvenance"] != "SIMULATED":
+        raise PermissionError("Outside generated source authority")
     c = event["payload"]["collection"]
     for outer, inner in (("aggregateId", "id"), ("aggregateVersion", "version"), ("estateId", "estateId"),
                          ("blockId", "blockId"), ("dataProvenance", "dataProvenance")):
@@ -74,6 +88,11 @@ def parse_event(raw, received_at):
     stamp = datetime.fromisoformat(event["timestamp"].replace("Z", "+00:00"))
     if stamp != datetime.fromisoformat(c["updatedAt"].replace("Z", "+00:00")):
         raise ValueError("Source chronology mismatch")
+    at = lambda key: datetime.fromisoformat(c[key].replace("Z", "+00:00"))
+    if not at("masterValidatedAt") <= at("createdAt") <= at("updatedAt") or at("collectedAt") > stamp:
+        raise ValueError("Invalid audit chronology")
+    if at("collectedAt").astimezone(ZoneInfo(c["estateTimezone"])).date().isoformat() != c["collectionDate"] or c["collectionDate"] < c["tappingDate"]:
+        raise ValueError("Invalid estate-local collection date")
     wet = Decimal(c["wetLatexKg"])
     exact = None if c["dryRubberExactKg"] is None else Decimal(c["dryRubberExactKg"])
     dry = None if c["dryRubberKg"] is None else Decimal(c["dryRubberKg"])
@@ -81,6 +100,21 @@ def parse_event(raw, received_at):
         measurement = c["currentMeasurement"]
         if measurement is None or wet * Decimal(measurement["drcPercent"]) / 100 != exact:
             raise ValueError("Source DRC arithmetic mismatch")
+        measured = datetime.fromisoformat(measurement["measuredAt"].replace("Z", "+00:00"))
+        recorded = datetime.fromisoformat(measurement["recordedAt"].replace("Z", "+00:00"))
+        if measurement["collectionId"] != c["id"] or measurement["dataProvenance"] != c["dataProvenance"] or measurement["introducedVersion"] > c["version"] or not at("collectedAt") <= measured <= recorded <= stamp:
+            raise ValueError("Invalid measurement evidence")
+    payload = event["payload"]
+    if name == "LatexCollectionRecorded":
+        if c["createdAt"] != c["updatedAt"] or payload["reason"] != c["backdateReason"]:
+            raise ValueError("Invalid creation evidence")
+    elif name == "DrcMeasurementRecorded":
+        if payload["measurementId"] != c["currentMeasurement"]["id"] or c["currentMeasurement"]["introducedVersion"] != c["version"]:
+            raise ValueError("Invalid measurement revision")
+    else:
+        adjustment = payload["adjustment"]
+        if not payload["previousVersion"] == c["version"] - 1 == adjustment["beforeVersion"] or adjustment["afterVersion"] != c["version"] or adjustment["approvedBy"] != c["updatedBy"] or adjustment["approvedAt"] != c["updatedAt"] or adjustment["correlationId"] != event["correlationId"]:
+            raise ValueError("Invalid adjustment evidence")
     # Fingerprint the validated full envelope in RAM; retain no actors/reasons/raw payload.
     return Revision(str(UUID(event["eventId"])), fingerprint(event), str(UUID(c["id"])), c["version"],
                     Scope(str(UUID(c["estateId"])), str(UUID(c["blockId"]))), date.fromisoformat(c["collectionDate"]),

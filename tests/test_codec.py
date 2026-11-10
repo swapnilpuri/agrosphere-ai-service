@@ -41,6 +41,9 @@ def test_schema_cross_field_arithmetic_and_duplicate_json_fail_closed():
         parse_event(b'{"eventType":"LatexCollectionRecorded","eventType":"DrcMeasurementRecorded"}', datetime.now(timezone.utc))
     with pytest.raises(ValueError):
         parse_event(b" " * 1048577, datetime.now(timezone.utc))
+    for token in (b'0e2147483647', b'1e-100000000', b'1234567890123456789012345'):
+        with pytest.raises(ValueError):
+            parse_event(b'{"value":' + token + b'}', datetime.now(timezone.utc))
 
 
 def test_generated_protocol_end_to_end_source_decode_and_contract_responses():

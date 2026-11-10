@@ -35,6 +35,7 @@ def create_app(runtime=None, use_environment=False):
             worker = Consumer(app.state.runtime.store, os.environ["AI_AMQP_URL"], app.state.runtime.guard.value["queue"], app.state.runtime.guard.value["diagnostics"])
             thread = threading.Thread(target=worker.run, daemon=True)
             thread.start()
+            app.state.runtime.live_ready = lambda: thread.is_alive() and not worker.paused
         try:
             yield
         finally:
@@ -97,6 +98,8 @@ def create_app(runtime=None, use_environment=False):
         return value
 
     def frozen(services, scope, q):
+        if q["mode"] == "LIVE_FIRST_RECEIPT" and not services.live_ready():
+            raise Unavailable("Live consumer unavailable")
         ds = services.store.dataset(scope, digest(q["datasetId"]), q["mode"])
         as_of = datetime.fromisoformat(q["asOf"].replace("Z", "+00:00"))
         label = datetime.fromisoformat(q["labelAsOf"].replace("Z", "+00:00")) if q.get("labelAsOf") else None

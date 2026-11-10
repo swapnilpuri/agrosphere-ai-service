@@ -1,3 +1,7 @@
+## Owner-approved M4 — 2026-11-09
+
+Owner approved Architecture M4_DELIVERY_PACKAGE.md revision 1 (SHA-256 befbee78062c2fcef6af0ea394fcc81be3e7638053deca142f136c66bc7cc93d), recorded in M4_DELIVERY_APPROVAL_2026_11_09.json. D01–D10 and E01–E10 are authorized, including conforming delegated exact contract/local release/pins and generated-only SQL/runtime verification. Work exclusively on M4; do not start another milestone without its owner prompt. Old M0-only exclusions below are superseded for this bounded scope. Preserve independent builds, existing work/data/private config and reviewed bytes. No production/Git publication/REAL/AEO or existing-target mutation. Engineering completion and owner acceptance remain separate.
+
 # Repository instructions
 
 Work only within this independent Git repository. No parent repository, submodules, shared persistence models, cross-service SQL or multi-service Maven parent.

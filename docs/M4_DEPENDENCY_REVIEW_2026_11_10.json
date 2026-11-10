@@ -1,0 +1,54 @@
+{
+  "scope": "Selected added direct dependencies only; PyPI version-reported vulnerability/installed-license inspection, not comprehensive environment security certification",
+  "observed_at": "2026-11-10T06:25:56.283122+00:00",
+  "packages": [
+    {
+      "name": "PyJWT",
+      "version": "2.15.1",
+      "installed_license": "MIT",
+      "pypi_url": "https://pypi.org/pypi/PyJWT/2.15.1/json",
+      "reported_vulnerabilities": [],
+      "metadata_license": "MIT"
+    },
+    {
+      "name": "cryptography",
+      "version": "50.0.2",
+      "installed_license": "Apache-2.0 OR BSD-3-Clause",
+      "pypi_url": "https://pypi.org/pypi/cryptography/50.0.2/json",
+      "reported_vulnerabilities": [],
+      "metadata_license": "Apache-2.0 OR BSD-3-Clause"
+    },
+    {
+      "name": "pika",
+      "version": "1.4.4",
+      "installed_license": "BSD-3-Clause",
+      "pypi_url": "https://pypi.org/pypi/pika/1.4.4/json",
+      "reported_vulnerabilities": [],
+      "metadata_license": "BSD-3-Clause"
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "installed_license": "MIT",
+      "pypi_url": "https://pypi.org/pypi/jsonschema/4.26.0/json",
+      "reported_vulnerabilities": [],
+      "metadata_license": "MIT"
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1",
+      "installed_license": "BSD-3-Clause",
+      "pypi_url": "https://pypi.org/pypi/httpx/0.28.1/json",
+      "reported_vulnerabilities": [],
+      "metadata_license": "BSD-3-Clause"
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.5",
+      "installed_license": "Apache-2.0",
+      "pypi_url": "https://pypi.org/pypi/tzdata/2026.5/json",
+      "reported_vulnerabilities": [],
+      "metadata_license": "Apache-2.0"
+    }
+  ]
+}

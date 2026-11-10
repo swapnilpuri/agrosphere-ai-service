@@ -33,7 +33,7 @@ class Consumer:
                 except Exception as error:
                     # Unknown storage failures pause. Only validated parser/admission errors diagnose.
                     from jsonschema import ValidationError
-                    if not isinstance(error, (ValueError, ValidationError, PermissionError)):
+                    if not isinstance(error, (ValueError, ValidationError)):
                         raise
                     result = "INVALID_OR_ADMISSION"
                 if result in {"INVALID_OR_ADMISSION", "CONFLICT"}:

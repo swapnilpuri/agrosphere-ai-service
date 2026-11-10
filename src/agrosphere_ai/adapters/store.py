@@ -32,10 +32,15 @@ class Store:
         self.guard.verify(row.scope)
         with self.connection() as conn:
             conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s,0))", (row.event_id,))
+            conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s,3))", (row.collection_id,))
             prior = conn.execute("SELECT body_hash,estate_id::text,block_id::text FROM ai_source_revision WHERE event_id=%s", (row.event_id,)).fetchall()
             if any(p[0] == row.body_hash for p in prior):
-                return "DUPLICATE"
-            scopes = sorted({(p[1], p[2]) for p in prior} | {(row.scope.estate_id, row.scope.block_id)})
+                # Preserve diagnosis on redelivery after a lost mandatory confirm.
+                conflicted = conn.execute("SELECT 1 FROM ai_conflict WHERE event_id=%s LIMIT 1", (row.event_id,)).fetchone()
+                return "CONFLICT" if conflicted else "DUPLICATE"
+            roots = conn.execute("SELECT event_id::text,estate_id::text,block_id::text,body->>'version',body->>'status',body->>'estate_timezone' FROM ai_source_revision WHERE body->>'collection_id'=%s", (row.collection_id,)).fetchall()
+            conflict = bool(prior) or any((p[1], p[2]) != (row.scope.estate_id, row.scope.block_id) or int(p[3]) == row.version or p[5] != row.estate_timezone or p[4] == 'VOIDED' and int(p[3]) < row.version and row.status != 'VOIDED' for p in roots)
+            scopes = sorted({(p[1], p[2]) for p in prior} | {(p[1], p[2]) for p in roots} | {(row.scope.estate_id, row.scope.block_id)})
             for estate, block in scopes:
                 conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s,1))", (estate + ":" + block,))
             count = conn.execute("SELECT count(*) FROM ai_source_revision WHERE estate_id=%s AND block_id=%s", (row.scope.estate_id, row.scope.block_id)).fetchone()[0]
@@ -46,7 +51,7 @@ class Store:
             row = replace(row, available_at=received, first_received_at=received)
             conn.execute("INSERT INTO ai_source_revision(event_id,body_hash,estate_id,block_id,first_received_at,body) VALUES (%s,%s,%s,%s,%s,%s)",
                          (row.event_id, row.body_hash, row.scope.estate_id, row.scope.block_id, received, Jsonb(json.loads(canonical(row)))))
-            if prior:
+            if conflict:
                 for estate, block in scopes:
                     conn.execute("INSERT INTO ai_conflict(estate_id,block_id,event_id,source_at,available_at) VALUES (%s,%s,%s,%s,%s)", (estate, block, row.event_id, row.source_at, received))
                 return "CONFLICT"
