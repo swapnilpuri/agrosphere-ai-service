@@ -6,10 +6,19 @@ CREATE TABLE ai_source_revision (
  body jsonb NOT NULL, PRIMARY KEY(event_id,body_hash)
 );
 CREATE INDEX ai_source_scope ON ai_source_revision(estate_id,block_id);
+-- Written in a separate transaction only AFTER the source transaction has committed.
+-- This is a conservative observed availability bound, not a fabricated exact commit instant.
+CREATE TABLE ai_availability (
+ event_id uuid NOT NULL, body_hash char(64) NOT NULL, confirmed_at timestamptz NOT NULL,
+ PRIMARY KEY(event_id,body_hash),
+ FOREIGN KEY(event_id,body_hash) REFERENCES ai_source_revision(event_id,body_hash)
+);
 CREATE TABLE ai_conflict (
  estate_id uuid NOT NULL, block_id uuid NOT NULL, event_id uuid NOT NULL,
- source_at timestamptz NOT NULL, available_at timestamptz NOT NULL DEFAULT clock_timestamp(),
- PRIMARY KEY(estate_id,block_id,event_id,source_at,available_at)
+ body_hash char(64) NOT NULL, source_at timestamptz NOT NULL,
+ observed_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+ PRIMARY KEY(estate_id,block_id,event_id,body_hash),
+ FOREIGN KEY(event_id,body_hash) REFERENCES ai_source_revision(event_id,body_hash)
 );
 CREATE TABLE ai_dataset (
  dataset_id char(64) PRIMARY KEY, corpus_hash char(64) NOT NULL,
@@ -34,6 +43,7 @@ CREATE FUNCTION ai_immutable() RETURNS trigger LANGUAGE plpgsql AS $$
  BEGIN RAISE EXCEPTION 'M4 records are append-only'; END;
 $$;
 CREATE TRIGGER ai_source_immutable BEFORE UPDATE OR DELETE ON ai_source_revision FOR EACH ROW EXECUTE FUNCTION ai_immutable();
+CREATE TRIGGER ai_availability_immutable BEFORE UPDATE OR DELETE ON ai_availability FOR EACH ROW EXECUTE FUNCTION ai_immutable();
 CREATE TRIGGER ai_conflict_immutable BEFORE UPDATE OR DELETE ON ai_conflict FOR EACH ROW EXECUTE FUNCTION ai_immutable();
 CREATE TRIGGER ai_dataset_immutable BEFORE UPDATE OR DELETE ON ai_dataset FOR EACH ROW EXECUTE FUNCTION ai_immutable();
 CREATE TRIGGER ai_model_immutable BEFORE UPDATE OR DELETE ON ai_model FOR EACH ROW EXECUTE FUNCTION ai_immutable();

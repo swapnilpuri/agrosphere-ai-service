@@ -1,3 +1,7 @@
+# M4 bounded local engineering verified — 2026-11-10
+
+AI 0.2.0 delivers exact observed dry/wet baselines/anomalies, immutable generated evaluation/model records, guarded seven-table journal/registry, conservative post-commit live availability and scoped closed-intent evidence composition. Business/consumer activation remains disabled by default. [Delivery and actual checks](../agrosphere-architecture/docs/milestones/M4_DELIVERY_VERIFICATION_2026_11_10.md) distinguish engineering verification from OPEN owner acceptance and synthetic/scientific/production limits. The current suite has 67 tests; real owned database/broker/Gateway/PKCE/Web and nonempty-upgrade/denial/recovery verification passed. Use only the owned Infrastructure verification harnesses; existing-target migration/activation is excluded. Older in-progress/foundation labels below are historical.
+
 # M4 local delivery in progress — 2026-11-10
 
 Owner-approved bounded M4 adds observed dry/wet mass baselines, immutable evaluation/model records, explicit point-in-time generated chronology and a closed-intent evidence composer. Business and broker activation default disabled. Engineering/owner acceptance remain separate; consult Architecture's checkpoint for actual checks. The historical foundation-only text below is superseded only for this approved scope.

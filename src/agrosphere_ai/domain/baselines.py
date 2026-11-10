@@ -146,8 +146,8 @@ class Dataset:
             raise ValueError("Dataset/clock identity required")
         if any(r.scope != self.scope or r.estate_timezone != self.estate_timezone for r in self.revisions):
             raise ValueError("No mixed scope or timezone dataset")
-        if self.mode == "LIVE_FIRST_RECEIPT" and any(r.available_at != r.first_received_at for r in self.revisions):
-            raise ValueError("Live availability must be actual first receipt")
+        if self.mode == "LIVE_FIRST_RECEIPT" and any(r.available_at < r.first_received_at for r in self.revisions):
+            raise ValueError("Live availability cannot precede the actual receipt")
         if type(self.conflicts) is not tuple:
             raise ValueError("Immutable conflicts required")
         for c in self.conflicts:

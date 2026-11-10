@@ -9,7 +9,7 @@ import psycopg
 from psycopg.types.json import Jsonb
 from agrosphere_ai.domain.baselines import Conflict, Dataset, Scope, canonical, evaluate
 from agrosphere_ai.adapters.codec import parse_event, revision_from_record, validate_pins, wire
-from agrosphere_ai.adapters.reference_http import NotFound
+from agrosphere_ai.adapters.reference_http import NotFound, Unavailable
 
 
 class StaleDataset(Exception):
@@ -29,6 +29,20 @@ class Store:
             yield conn
 
     def ingest(self, row):
+        outcome = self._ingest(row)
+        # Returning from _ingest exits its context and successfully commits the source fact.
+        # A crash/unknown commit outcome leaves no availability marker and no input ACK.
+        self.confirm_available(row.event_id, row.body_hash)
+        return outcome
+
+    def confirm_available(self, event_id, body_hash):
+        with self.connection() as conn:
+            row = conn.execute("SELECT first_received_at,clock_timestamp() FROM ai_source_revision WHERE event_id=%s AND body_hash=%s", (event_id, body_hash)).fetchone()
+            if row is None or row[1] < row[0]:
+                raise Unavailable("Receipt confirmation or clock unavailable")
+            conn.execute("INSERT INTO ai_availability VALUES (%s,%s,%s) ON CONFLICT DO NOTHING", (event_id, body_hash, row[1]))
+
+    def _ingest(self, row):
         self.guard.verify(row.scope)
         with self.connection() as conn:
             conn.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s,0))", (row.event_id,))
@@ -53,18 +67,20 @@ class Store:
                          (row.event_id, row.body_hash, row.scope.estate_id, row.scope.block_id, received, Jsonb(json.loads(canonical(row)))))
             if conflict:
                 for estate, block in scopes:
-                    conn.execute("INSERT INTO ai_conflict(estate_id,block_id,event_id,source_at,available_at) VALUES (%s,%s,%s,%s,%s)", (estate, block, row.event_id, row.source_at, received))
+                    conn.execute("INSERT INTO ai_conflict(estate_id,block_id,event_id,body_hash,source_at,observed_at) VALUES (%s,%s,%s,%s,%s,%s)", (estate, block, row.event_id, row.body_hash, row.source_at, received))
                 return "CONFLICT"
             return "COMMITTED"
 
     def live_dataset(self, scope):
         self.guard.verify(scope)
         with self.connection() as conn:
-            rows = conn.execute("SELECT body FROM ai_source_revision WHERE estate_id=%s AND block_id=%s ORDER BY event_id,body_hash LIMIT 1001", (scope.estate_id, scope.block_id)).fetchall()
-            conflicts = conn.execute("SELECT event_id::text,source_at,available_at FROM ai_conflict WHERE estate_id=%s AND block_id=%s", (scope.estate_id, scope.block_id)).fetchall()
+            rows = conn.execute("SELECT r.body,a.confirmed_at FROM ai_source_revision r LEFT JOIN ai_availability a USING(event_id,body_hash) WHERE r.estate_id=%s AND r.block_id=%s ORDER BY r.event_id,r.body_hash LIMIT 1001", (scope.estate_id, scope.block_id)).fetchall()
+            conflicts = conn.execute("SELECT c.event_id::text,c.source_at,a.confirmed_at FROM ai_conflict c LEFT JOIN ai_availability a USING(event_id,body_hash) WHERE c.estate_id=%s AND c.block_id=%s", (scope.estate_id, scope.block_id)).fetchall()
+        if any(r[1] is None for r in rows) or any(c[2] is None for c in conflicts):
+            raise Unavailable("Source commit awaits confirmation")
         zone = next(s["timezone"] for s in self.guard.value["scopes"] if s["estateId"] == scope.estate_id and s["blockId"] == scope.block_id)
-        return Dataset(scope, zone, "LIVE_FIRST_RECEIPT", tuple(revision_from_record(r[0]) for r in rows), self.contracts,
-                       "LIVE_JOURNAL_V1", self.guard.value["runId"], "DB_FIRST_COMMITTED_RECEIPT_V1", tuple(Conflict(*r) for r in conflicts))
+        return Dataset(scope, zone, "LIVE_FIRST_RECEIPT", tuple(replace(revision_from_record(r[0]), available_at=r[1]) for r in rows), self.contracts,
+                       "LIVE_JOURNAL_V1", self.guard.value["runId"], "OBSERVED_AFTER_SOURCE_COMMIT_V1", tuple(Conflict(*r) for r in conflicts))
 
     def dataset(self, scope, dataset_id, mode):
         self.guard.verify(scope)

@@ -203,3 +203,21 @@ def test_cross_estate_dataset_id_is_not_a_capability(api):
     other = path().replace(SCOPE.estate_id, "00000000-0000-0000-0000-000000000099")
     assert api.client.get(other, params=params(api), headers=headers()).status_code == 403
     assert api.calls == []
+
+
+def test_optional_environment_evidence_keeps_its_explicit_window_and_no_causal_claim(api):
+    body = {**request(api), 'environmentFrom': '2026-08-01T00:00:00Z', 'environmentTo': '2026-08-02T00:00:00Z'}
+    r = api.client.post(path('/assistant'), json=body, headers=headers())
+    assert r.status_code == 200
+    links = [ref for statement in r.json()['statements'] for ref in statement['evidenceRefs'] if ref['kind'] == 'ENVIRONMENT']
+    assert len(links) == 1 and 'environment/observations?' in links[0]['href']
+    assert any('no causal' in s['text'] for s in r.json()['statements'])
+
+
+def test_inaccessible_environment_evidence_fails_closed(api, monkeypatch):
+    def denied(*args):
+        raise PermissionError()
+    monkeypatch.setattr(api.references, 'environment', denied)
+    body = {**request(api), 'environmentFrom': '2026-08-01T00:00:00Z', 'environmentTo': '2026-08-02T00:00:00Z'}
+    r = api.client.post(path('/assistant'), json=body, headers=headers())
+    assert r.status_code == 403 and 'statements' not in r.json()
