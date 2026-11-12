@@ -19,15 +19,18 @@ class Guard:
         if len(raw) > 16384 or hashlib.sha256(raw).hexdigest() != self.hash:
             raise PermissionError("Invalid generated manifest")
         m = json.loads(raw)
-        UUID(m["runId"])
-        if not re.fullmatch(r"agrosphere-3a-check-[0-9a-f]{8}", m["project"]):
+        run = UUID(m["runId"])
+        close_project = "agrosphere-poc-close-" + run.hex
+        is_close = m["project"] == close_project and m["runId"] == str(run)
+        if not is_close and not re.fullmatch(r"agrosphere-3a-check-[0-9a-f]{8}", m["project"]):
             raise PermissionError("Unowned project")
         if (self.path.parent / ".generated-m4-owner").read_text() != m["runId"]:
             raise PermissionError("Missing ownership marker")
         created = datetime.fromisoformat(m["createdAt"])
         expires = datetime.fromisoformat(m["expiresAt"])
         now = datetime.now(timezone.utc)
-        if created.tzinfo is None or expires.tzinfo is None or not created <= now < expires or expires - created > timedelta(hours=4):
+        lifetime = timedelta(hours=2 if is_close else 4)
+        if created.tzinfo is None or expires.tzinfo is None or not created <= now < expires or expires - created > lifetime:
             raise PermissionError("Generated fixture expired")
         if hashlib.sha256(self.dsn.encode()).hexdigest() != m["dsnSha256"] or m["dbMarker"] != "M4:" + m["runId"]:
             raise PermissionError("Wrong generated database")

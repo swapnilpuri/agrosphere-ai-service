@@ -36,6 +36,28 @@ def test_guard_requires_exact_manifest_marker_scope_dsn_and_lifetime(tmp_path):
         guard.verify()
 
 
+def test_poc_close_project_is_bound_to_run_and_two_hour_window(tmp_path):
+    run = str(uuid4())
+    dsn = "postgresql://generated-runtime:generated-password@postgres:5432/generated"
+    now = datetime.now(timezone.utc)
+    manifest = dict(runId=run, project="agrosphere-poc-close-" + run.replace("-", ""),
+                    createdAt=now.isoformat(), expiresAt=(now + timedelta(hours=2)).isoformat(),
+                    dsnSha256=hashlib.sha256(dsn.encode()).hexdigest(), dbMarker="M4:" + run,
+                    scopes=[dict(estateId=SCOPE.estate_id, blockId=SCOPE.block_id)])
+    path = tmp_path / "manifest.json"
+    (tmp_path / ".generated-m4-owner").write_text(run)
+    def guard(value):
+        path.write_text(json.dumps(value))
+        return Guard(path, hashlib.sha256(path.read_bytes()).hexdigest(), dsn)
+    guard(manifest).verify(SCOPE)
+    for project in ["agrosphere-poc-close-" + uuid4().hex,
+                    manifest["project"] + "-extra", "agrosphere-poc-close-1234abcd", "existing-stack"]:
+        with pytest.raises(PermissionError):
+            guard({**manifest, "project": project})
+    with pytest.raises(PermissionError):
+        guard({**manifest, "expiresAt": (now + timedelta(hours=2, seconds=1)).isoformat()})
+
+
 @pytest.mark.parametrize("outcome,diagnostic_error,expected", [("COMMITTED", False, ["commit", "ack"]),
     ("DUPLICATE", False, ["commit", "ack"]), ("CONFLICT", False, ["commit", "confirm", "ack"]),
     ("CONFLICT", True, ["commit", "confirm"]), ("INVALID", False, ["confirm", "ack"]),
